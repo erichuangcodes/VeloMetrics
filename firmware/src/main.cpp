@@ -1,9 +1,11 @@
 #include <Arduino.h>
 #include <TFT_eSPI.h>
 #include <lvgl.h>
+#include <TinyGPSPlus.h>
 
 // Include UI screens
 #include "ui.h"
+#include "gps.h"
 
 // Create the TFT display driver
 TFT_eSPI tft = TFT_eSPI();
@@ -25,31 +27,30 @@ void my_flush_callback(lv_display_t *disp, const lv_area_t *area, uint8_t *px_ma
     lv_display_flush_ready(disp);
 }
 
+
 void setup() {
     Serial.begin(115200);
-    Serial.println("VeloMetrics starting...");
-
-    tft.init();
-    tft.fillScreen(TFT_BLACK);
-    tft.setRotation(0);
-
-    lv_init();
-
-    // Initialize the LVGL display driver
-    lv_display_t *disp = lv_display_create(240, 320);
-    lv_display_set_flush_cb(disp, my_flush_callback);
-    lv_display_set_buffers(disp, lv_draw_buf, NULL, sizeof(lv_draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
-
-    build_home_screen();
-    build_stats_screen();
-    add_screen_dots(home_screen, 0);
-    add_screen_dots(stats_screen, 1);
-    lv_scr_load(home_screen);
-
-    Serial.println("Setup complete!");
+    gpsSerial.begin(9600, SERIAL_8N1, 16, 17);
+    Serial.println("GPS test starting...");
 }
 
 void loop() {
-    lv_timer_handler();
-    delay(5);
+    while (gpsSerial.available() > 0) {
+        char c = gpsSerial.read();
+        Serial.write(c);  // Print raw GPS data to Serial Monitor
+        gps.encode(c);
+    }
+
+    if (gps.location.isUpdated()) {
+        Serial.print("LAT: ");
+        Serial.println(gps.location.lat(), 6);
+        Serial.print("LON: ");
+        Serial.println(gps.location.lng(), 6);
+        Serial.print("SPEED: ");
+        Serial.println(gps.speed.mph());
+        Serial.print("SATELLITES: ");
+        Serial.println(gps.satellites.value());
+    }
+
+    delay(100);
 }

@@ -6,6 +6,7 @@
 
 #include <lvgl.h>
 #include "ui.h"
+#include "gps.h"
 
 //POINTERS FOR OBJECTS ON SCREEN 
 
