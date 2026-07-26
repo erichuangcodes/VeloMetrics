@@ -518,16 +518,35 @@ void add_screen_dots(lv_obj_t *screen, int active_index) {
 // Function to update the UI with new values
 
 void update_ui() {
+        if (!gps_valid) {
+        lv_label_set_text(speed_label, "---");
+        lv_label_set_text(distance_label, "No GPS");
+        return;
+    }
+
+    // Feed GPS coordinates to map trail ]
+    static uint32_t last_point_time = 0;
+    uint32_t now = lv_tick_get();
+    if (now - last_point_time > 1000) { // add one point per second
+        if (trail_count < MAX_TRAIL_POINTS) {
+            trail[trail_count].lat = gps_lat;
+            trail[trail_count].lon = gps_lon;
+            trail_count++;
+        }
+        last_point_time = now;
+        update_map();
+    }
+
     //Speed
     if (speed_label != NULL) {
     char speed_text[16];
-    lv_snprintf(speed_text, sizeof(speed_text), "%.1f", fake_speed);
+    lv_snprintf(speed_text, sizeof(speed_text), "%.1f", gps_speed_mph);
     lv_label_set_text(speed_label, speed_text);
 }
     // Distance
     if (distance_label != NULL) {
     char distance_text[16];
-    lv_snprintf(distance_text, sizeof(distance_text), "%.1f mi", fake_distance);
+    lv_snprintf(distance_text, sizeof(distance_text), "%.1f mi", gps_distance_miles);
     lv_label_set_text(distance_label, distance_text);
 }
     // Battery

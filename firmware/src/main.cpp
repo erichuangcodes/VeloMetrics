@@ -30,11 +30,14 @@ void my_flush_callback(lv_display_t *disp, const lv_area_t *area, uint8_t *px_ma
 
 void setup() {
     Serial.begin(115200);
+    delay(100);
     gpsSerial.begin(9600, SERIAL_8N1, 16, 17);
     Serial.println("GPS test starting...");
+    gps_init();
 }
 
 void loop() {
+    gps_update();
     while (gpsSerial.available() > 0) {
         char c = gpsSerial.read();
         Serial.write(c);  // Print raw GPS data to Serial Monitor

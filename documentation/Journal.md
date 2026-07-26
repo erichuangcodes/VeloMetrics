@@ -43,3 +43,7 @@ Now that I got the UI to work on the screen, I'm not worried about that anymore.
 I thought the UI was pretty basic and there wasn't that much going on, it was just numbers. I decided to rewrite the UI to make it look cleaner and look like a actual bike computer UI. It looks pretty cool and slick now. Additionally I made the header section independent of each screen by putting it on the base screen, so now its not affected by the other screens PLUS i dont need to add a additional pointer to the header objects everytime i make a new scren.
 
 **Total time spent: 2h**
+
+# July 25: Started testing and making the gps screen
+
+I start with wiring up the gps module up to the rest of the components. I ran into some issues as the gps was not locking on to any sattlelites so i thought that i mightve been a wiring issue so i used a led to test my setup and it was correct. 
