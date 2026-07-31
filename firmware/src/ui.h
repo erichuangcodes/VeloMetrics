@@ -32,8 +32,6 @@ extern lv_obj_t *position_dot;
 
 
 // Mock Data
-extern float fake_speed;
-extern float fake_distance;
 extern int fake_battery;
 extern int fake_temp;
 extern float fake_avg_speed;

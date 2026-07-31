@@ -68,5 +68,6 @@ void gps_update() {
         gps_lon = current_lon;
     } else {
         gps_valid = false;
+        Serial.println("gps not working");
     }
 }

@@ -40,8 +40,6 @@ static lv_obj_t *stats_dot;
 static lv_obj_t *settings_dot;
 
 // Testing / Mock Data Values
-float fake_speed = 6.7f;
-float fake_distance = 16.7f;
 int fake_battery = 68;
 int fake_temp = 35;
 float fake_avg_speed = 14.2f;
@@ -156,15 +154,15 @@ void build_home_screen() {
     lv_obj_set_style_line_width(vert_divider, 2, 0);
     lv_obj_set_pos(vert_divider, 90, 170);
 
-    // ================================================================
+    
     // SPEED SECTION (y=32 to y=170)
     // Center of section = 32 + (138/2) = 101
     // Orbitron 48 is roughly 55px tall
     // So top of number = 101 - 27 = 74
-    // ================================================================
+
 
     speed_label = lv_label_create(home_screen);
-    lv_label_set_text(speed_label, "6.7");
+    lv_label_set_text(speed_label, "0.0");
     lv_obj_set_style_text_font(speed_label, &Orbitron_72_Regular, 0);
     lv_obj_set_style_text_color(speed_label, lv_color_black(), 0);
     lv_obj_set_pos(speed_label, 10, 74);
@@ -176,13 +174,13 @@ void build_home_screen() {
     lv_obj_set_style_text_color(unit_label, lv_color_hex(0x00BCD4), 0);
     lv_obj_align(unit_label, LV_ALIGN_TOP_RIGHT, -10, 40);
 
-    // ================================================================
+   
     // BOTTOM LEFT — labels (y=170 to y=290, x=0 to x=90)
     // Two rows, each 60px tall
     // Row 1 center: 170 + 30 = 200, Row 2 center: 170 + 90 = 260
     // Exo_12 is ~14px tall, so top = center - 7
     // Row 1 label top: 193, Row 2 label top: 253
-    // ================================================================
+   
 
     lv_obj_t *distance_title = lv_label_create(home_screen);
     lv_label_set_text(distance_title, "DISTANCE");
@@ -204,13 +202,13 @@ void build_home_screen() {
 
 
     distance_label = lv_label_create(home_screen);
-    lv_label_set_text(distance_label, "16.7 mi");
+    lv_label_set_text(distance_label, "0.0 mi");
     lv_obj_set_style_text_font(distance_label, &Exo_24_Regular, 0);
     lv_obj_set_style_text_color(distance_label, lv_color_black(), 0);
     lv_obj_set_pos(distance_label, 98, 186);
 
     time_label = lv_label_create(home_screen);
-    lv_label_set_text(time_label, "1:07:59");
+    lv_label_set_text(time_label, "00:00:00");
     lv_obj_set_style_text_font(time_label, &Exo_24_Regular, 0);
     lv_obj_set_style_text_color(time_label, lv_color_black(), 0);
     lv_obj_set_pos(time_label, 98, 246);
