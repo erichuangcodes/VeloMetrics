@@ -11,7 +11,7 @@
 TFT_eSPI tft = TFT_eSPI();
 
 // LVGL drawing buffer 240 by 10 
-#define DRAW_BUF_SIZE (240 * 10 * 2); // 240 pixels * 10 rows * 2 bytes per pixel
+#define DRAW_BUF_SIZE (240 * 10 * 2) // 240 pixels * 10 rows * 2 bytes per pixel
 alignas(4) static uint8_t lv_draw_buf[240 * 10 *2];
 
 // Flush callback sends pixels from LVGL buffer to the physical LCD
@@ -59,6 +59,7 @@ void setup() {
 
 void loop() {
     gps_update();
+    update_ui();
     
     // Debug — print every 2 seconds
     static uint32_t last_print = 0;

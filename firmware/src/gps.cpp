@@ -27,47 +27,29 @@ void gps_init() {
 }
 
 void gps_update() {
-    // Read all available bytes from the GPS module
-    // and feed them into TinyGPS++ for parsing
     while (gpsSerial.available() > 0) {
         gps.encode(gpsSerial.read());
     }
 
-    // Only update values if GPS has a valid fix
-    if (gps.location.isValid() && gps.location.isUpdated()) {
-        gps_valid = true;
+    // Valid = we have a fix AND data is recent (< 5 sec old)
+    gps_valid = gps.location.isValid() && gps.location.age() < 5000;
 
-        // Get current coordinates
+    // Only refresh the stored values when a new sentence arrived
+    if (gps.location.isUpdated()) {
         float current_lat = gps.location.lat();
         float current_lon = gps.location.lng();
-
-        // Update speed — TinyGPS++ gives speed in knots, convert to mph
-        // 1 knot = 1.15078 mph
         gps_speed_mph = gps.speed.mph();
 
-        // Calculate distance traveled since last position
         if (has_prev) {
-            // TinyGPS++ has a built-in distance function
-            // distanceBetween() returns meters
             float dist_meters = TinyGPSPlus::distanceBetween(
-                prev_lat, prev_lon,
-                current_lat, current_lon
+                prev_lat, prev_lon, current_lat, current_lon
             );
-
-            // Convert meters to miles (1 mile = 1609.34 meters)
             gps_distance_miles += dist_meters / 1609.34f;
         }
-
-        // Save current position as previous for next update
         prev_lat = current_lat;
         prev_lon = current_lon;
         has_prev = true;
-
-        // Store coordinates for the map
         gps_lat = current_lat;
         gps_lon = current_lon;
-    } else {
-        gps_valid = false;
-        Serial.println("gps not working");
     }
 }

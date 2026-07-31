@@ -154,12 +154,6 @@ void build_home_screen() {
     lv_obj_set_style_line_width(vert_divider, 2, 0);
     lv_obj_set_pos(vert_divider, 90, 170);
 
-    
-    // SPEED SECTION (y=32 to y=170)
-    // Center of section = 32 + (138/2) = 101
-    // Orbitron 48 is roughly 55px tall
-    // So top of number = 101 - 27 = 74
-
 
     speed_label = lv_label_create(home_screen);
     lv_label_set_text(speed_label, "0.0");
@@ -173,15 +167,7 @@ void build_home_screen() {
     lv_obj_set_style_text_font(unit_label, &Exo_18_Regular, 0);
     lv_obj_set_style_text_color(unit_label, lv_color_hex(0x00BCD4), 0);
     lv_obj_align(unit_label, LV_ALIGN_TOP_RIGHT, -10, 40);
-
    
-    // BOTTOM LEFT — labels (y=170 to y=290, x=0 to x=90)
-    // Two rows, each 60px tall
-    // Row 1 center: 170 + 30 = 200, Row 2 center: 170 + 90 = 260
-    // Exo_12 is ~14px tall, so top = center - 7
-    // Row 1 label top: 193, Row 2 label top: 253
-   
-
     lv_obj_t *distance_title = lv_label_create(home_screen);
     lv_label_set_text(distance_title, "DISTANCE");
     lv_obj_set_style_text_font(distance_title, &Exo_12_Regular, 0);
@@ -473,10 +459,10 @@ void switch_screen() {
         lv_scr_load(stats_screen);
         current_screen = 1;
     } else if (current_screen == 1) {
-        lv_scr_load(home_screen);
+        lv_scr_load(map_screen);
         current_screen = 2;
     } else if (current_screen == 2) {
-        lv_scr_load(map_screen);
+        lv_scr_load(home_screen);
         current_screen = 0;
     }
     
