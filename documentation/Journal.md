@@ -68,3 +68,9 @@ Photos:
 ![alt text](image-2.png)
 ![alt text](image-3.png)
 **Total time spent: 2h**
+
+# August 6: Started making the CAD enclosure
+
+# August 7: Made a few design aspect decisions 
+
+Sd card mechanisms, sliding shield to protect it when not in use, easy access and storage

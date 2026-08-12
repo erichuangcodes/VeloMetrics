@@ -29,7 +29,7 @@ extern lv_obj_t *localtime_label;
 
 extern lv_obj_t *position_dot;
 
-
+extern lv_obj_t *screensaver;
 
 // Mock Data
 extern int fake_battery;

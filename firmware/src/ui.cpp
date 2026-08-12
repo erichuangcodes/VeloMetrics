@@ -38,6 +38,7 @@ lv_obj_t *localtime_label = NULL;
 static lv_obj_t *home_dot;
 static lv_obj_t *stats_dot;
 static lv_obj_t *settings_dot;
+lv_obj_t *screensaver = NULL;
 
 // Testing / Mock Data Values
 int fake_battery = 68;
@@ -198,6 +199,19 @@ void build_home_screen() {
     lv_obj_set_style_text_font(time_label, &Exo_24_Regular, 0);
     lv_obj_set_style_text_color(time_label, lv_color_black(), 0);
     lv_obj_set_pos(time_label, 98, 246);
+
+
+    screensaver = lv_arc_create(home_screen);
+    lv_obj_set_size(screensaver, 20, 20);
+    lv_arc_set_rotation(screensaver, 0);
+    lv_arc_set_bg_angles(screensaver, 0, 360);
+    lv_arc_set_angles(screensaver, 0, 90); 
+    lv_obj_remove_style(screensaver, NULL, LV_PART_KNOB); // hide the draggable knob
+    lv_obj_set_style_arc_color(screensaver, lv_color_hex(0x00BCD4), LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(screensaver, 3, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_opa(screensaver, LV_OPA_TRANSP, LV_PART_MAIN); 
+    lv_obj_align_to(screensaver, unit_label, LV_ALIGN_OUT_BOTTOM_MID, 0, 6); 
+    lv_obj_remove_flag(screensaver, LV_OBJ_FLAG_CLICKABLE); 
 }
 
 
@@ -435,23 +449,6 @@ void update_map() {
     lv_obj_move_foreground(position_dot);
 }
 
-
-
-
-
-
-
-
-
-void build_settings_screen() {
-
-}
-
-
-
-
-
-
 static int current_screen = 0; //0 = home, 1 = stats
 
 void switch_screen() {
@@ -466,7 +463,7 @@ void switch_screen() {
         current_screen = 0;
     }
     
-}
+} 
 
 void add_screen_dots(lv_obj_t *screen, int active_index) {
 
@@ -502,7 +499,37 @@ void add_screen_dots(lv_obj_t *screen, int active_index) {
 // Function to update the UI with new values
 
 void update_ui() {
-        if (!gps_valid) {
+    // Heartbeat — spins continuously to confirm the UI loop is alive.
+    // Runs before the gps_valid check so it keeps moving even without a fix.
+    if (screensaver != NULL) {
+        static int16_t screensaver_rotation = 0;
+        screensaver_rotation = (screensaver_rotation + 6) % 360; // speed: 6°/frame
+        lv_arc_set_rotation(screensaver, screensaver_rotation);
+        lv_obj_invalidate(screensaver);
+    } else {
+        static bool printed_once = false;
+        if (!printed_once) {
+            Serial.println("screensaver is NULL!");
+            printed_once = true;
+        }
+    }
+
+    // TEMP TEST — fake incrementing time, confirms labels update even without GPS.
+    // Also placed before the gps_valid check so it keeps climbing regardless of fix status.
+    if (time_label != NULL) {
+        static uint32_t fake_seconds = 0;
+        fake_seconds++;
+
+        uint32_t hours = fake_seconds / 3600;
+        uint32_t minutes = (fake_seconds % 3600) / 60;
+        uint32_t seconds = fake_seconds % 60;
+
+        char time_text[16];
+        lv_snprintf(time_text, sizeof(time_text), "%02u:%02u:%02u", hours, minutes, seconds);
+        lv_label_set_text(time_label, time_text);
+    }
+
+    if (!gps_valid) {
         lv_label_set_text(speed_label, "---");
         lv_label_set_text(distance_label, "No GPS");
         return;

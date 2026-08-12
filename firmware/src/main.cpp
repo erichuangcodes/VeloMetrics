@@ -10,6 +10,10 @@
 // Create the TFT display driver
 TFT_eSPI tft = TFT_eSPI();
 
+uint32_t my_tick_get_cb(void) {
+    return millis();
+}
+
 // LVGL drawing buffer 240 by 10 
 #define DRAW_BUF_SIZE (240 * 10 * 2) // 240 pixels * 10 rows * 2 bytes per pixel
 alignas(4) static uint8_t lv_draw_buf[240 * 10 *2];
@@ -29,18 +33,19 @@ void my_flush_callback(lv_display_t *disp, const lv_area_t *area, uint8_t *px_ma
 
 void setup() {
     Serial.begin(115200);
+    delay(10000);
     Serial.println("VeloMetrics starting...");
-
     tft.init();
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(0);
 
     lv_init();
+    lv_tick_set_cb(my_tick_get_cb); // Set the tick callback for LVGL
 
-    // Initialize the LVGL display driver
     lv_display_t *disp = lv_display_create(240, 320);
     lv_display_set_flush_cb(disp, my_flush_callback);
     lv_display_set_buffers(disp, lv_draw_buf, NULL, sizeof(lv_draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
+
 
     create_global_header();
     build_home_screen();
@@ -49,10 +54,13 @@ void setup() {
     add_screen_dots(home_screen, 0);
     add_screen_dots(stats_screen, 1);
     add_screen_dots(map_screen, 2);
+    Serial.println("dots done");
     lv_scr_load(home_screen);
+  
 
     delay(1000);
     gps_init();
+    Serial.println("gps init done");
 
     Serial.println("Setup complete");
 }
@@ -68,6 +76,14 @@ void loop() {
         Serial.println(gps_valid ? "TRUE" : "FALSE");
         Serial.print("satellites: ");
         Serial.println(gps.satellites.value());
+        Serial.print(" | lat: ");
+        Serial.print(gps_lat, 6);
+        Serial.print(" | lon: ");
+        Serial.print(gps_lon, 6);
+        Serial.print(" | speed_mph: ");
+        Serial.print(gps_speed_mph, 1);
+        Serial.print(" | distance_mi: ");
+        Serial.println(gps_distance_miles, 3);
         last_print = millis();
     }
     
