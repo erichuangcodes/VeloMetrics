@@ -24,27 +24,44 @@ void gps_init() {
     // 9600 is the NEO-6M's default communication speed
     gpsSerial.begin(9600, SERIAL_8N1, 16, 17);
     Serial.println("GPS initialized on GPIO 16/17");
+    uint8_t setRate5Hz[] = {
+        0xB5, 0x62, 0x06, 0x08, 0x06, 0x00,
+        0xC8, 0x00, 0x01, 0x00, 0x01, 0x00,
+        0xDE, 0x6A
+    };
+    gpsSerial.write(setRate5Hz, sizeof(setRate5Hz));
 }
 
+#define GPS_SPEED_DEADBAND_MPH 1.0f //Makes anything below 1mph not really moving
+#define GPS_DISTANCE_DEADBAND_METERS 1.5f // makes anything below 1.5 meteres not actually moving
 void gps_update() {
     while (gpsSerial.available() > 0) {
         gps.encode(gpsSerial.read());
     }
 
-    // Valid = we have a fix AND data is recent (< 5 sec old)
-    gps_valid = gps.location.isValid() && gps.location.age() < 5000;
+    // Valid = we have a fix AND data is recent ( 2.5 sec old)
+    gps_valid = gps.location.isValid() && gps.location.age() < 2500;
 
     // Only refresh the stored values when a new sentence arrived
     if (gps.location.isUpdated()) {
         float current_lat = gps.location.lat();
         float current_lon = gps.location.lng();
-        gps_speed_mph = gps.speed.mph();
+        float real_speed = gps.speed.mph();
+        
+        if (real_speed < GPS_SPEED_DEADBAND_MPH) {
+            gps_speed_mph = 0.0f;
+        }
+        else { 
+            gps_speed_mph = real_speed;
+        }
 
         if (has_prev) {
             float dist_meters = TinyGPSPlus::distanceBetween(
                 prev_lat, prev_lon, current_lat, current_lon
             );
-            gps_distance_miles += dist_meters / 1609.34f;
+            if (dist_meters >= GPS_DISTANCE_DEADBAND_METERS) {
+                gps_distance_miles += dist_meters / 1609.34f;   
+            }
         }
         prev_lat = current_lat;
         prev_lon = current_lon;

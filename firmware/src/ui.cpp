@@ -387,8 +387,6 @@ void gps_to_pixel(float lat, float lon, int *px, int *py) {
 }
 
 
-
-
 void build_map_screen() {
     map_screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(map_screen, lv_color_hex(0xF8FAFC), 0);
@@ -406,23 +404,16 @@ void build_map_screen() {
     lv_obj_set_pos(position_dot, 115, 155);
 }
 
+static lv_obj_t *trail_segments[MAX_TRAIL_POINTS - 1];
+static int trail_segment_count = 0;
+
 void update_map() {
     if (trail_count < 2) return;
 
-    // Delete all children of map_screen except position_dot
-    // then redraw all trail lines fresh
-    lv_obj_t *child = lv_obj_get_child(map_screen, 0);
-    while (child != NULL) {
-        lv_obj_t *next = lv_obj_get_child(map_screen, 0);
-        if (child != position_dot) {
-            lv_obj_del(child);
-        }
-        child = next;
-        if (child == position_dot) {
-            child = lv_obj_get_child(map_screen, 1);
-        }
+    for (int i = 0; i < trail_segment_count; i++) {
+        lv_obj_del(trail_segments[i]);
     }
-
+    trail_segment_count = 0;
     // Draw all trail segments fresh
     static lv_point_precise_t point_pool[MAX_TRAIL_POINTS][2];
 
@@ -440,6 +431,7 @@ void update_map() {
         lv_line_set_points(segment, point_pool[i], 2);
         lv_obj_set_style_line_color(segment, lv_color_black(), 0);
         lv_obj_set_style_line_width(segment, 2, 0);
+        trail_segments[trail_segment_count++] = segment;
     }
 
     // Move dot to current position, keep it on top
@@ -535,6 +527,13 @@ void update_ui() {
         return;
     }
 
+    static uint32_t last_label_update = 0;
+    uint32_t label_now = lv_tick_get();
+    if (label_now - last_label_update < 500) {
+        return;
+    }
+    last_label_update = label_now;
+    
     // Feed GPS coordinates to map trail ]
     static uint32_t last_point_time = 0;
     uint32_t now = lv_tick_get();

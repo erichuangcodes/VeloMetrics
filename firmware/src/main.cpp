@@ -33,7 +33,7 @@ void my_flush_callback(lv_display_t *disp, const lv_area_t *area, uint8_t *px_ma
 
 void setup() {
     Serial.begin(115200);
-    delay(10000);
+    delay(100);
     Serial.println("VeloMetrics starting...");
     tft.init();
     tft.fillScreen(TFT_BLACK);
