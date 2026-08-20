@@ -1,4 +1,5 @@
 #include "gps.h"
+#include <cmath>
 
 // The GPS parser object
 TinyGPSPlus gps;
@@ -13,6 +14,8 @@ float gps_distance_miles = 0.0f;
 float gps_lat = 0.0f;
 float gps_lon = 0.0f;
 bool gps_valid = false;
+int gps_local_hour = 0;
+int gps_local_minute = 0;
 
 // Tracks previous position for distance calculation
 static float prev_lat = 0.0f;
@@ -69,4 +72,15 @@ void gps_update() {
         gps_lat = current_lat;
         gps_lon = current_lon;
     }
+
+
+    //Time function for local time
+    if (gps.time.isValid() && gps.location.isValid()) {
+        float lon_value = gps_lon/15.0f;
+        int offset = (int)round(lon_value);
+        int raw_hour = gps.time.hour();
+        gps_local_hour = (raw_hour + 24) % 24;
+        gps_local_minute = gps.time.minute();
+    }
+
 }

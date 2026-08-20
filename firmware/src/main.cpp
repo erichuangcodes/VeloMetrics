@@ -7,6 +7,10 @@
 #include "ui.h"
 #include "gps.h"
 
+#define frontbutton 4
+#define backbutton 5
+
+
 // Create the TFT display driver
 TFT_eSPI tft = TFT_eSPI();
 
@@ -62,7 +66,8 @@ void setup() {
     gps_init();
     Serial.println("gps init done");
 
-    Serial.println("Setup complete");
+    pinMode(frontbutton, INPUT_PULLUP);
+    pinMode(backbutton, INPUT_PULLUP);
 }
 
 void loop() {
@@ -87,6 +92,35 @@ void loop() {
         last_print = millis();
     }
     
+    static bool last_frontbutton_state = HIGH;
+    static uint32_t last_frontbuttonpress_time =0;
+    bool current_frontbutton_state = digitalRead(frontbutton);
+
+    if (current_frontbutton_state == LOW && last_frontbutton_state == HIGH) {
+        if (millis() - last_frontbuttonpress_time > 200) {
+            switch_screen();
+            last_frontbuttonpress_time = millis();
+        }
+    }
+
+    static bool last_backbutton_state = HIGH;
+    static uint32_t last_backbuttonpresstime = 0;
+    bool current_backbutton_state = digitalRead(backbutton);
+
+    if (current_backbutton_state == LOW && last_backbutton_state == HIGH) {
+        if (millis() - last_backbuttonpresstime > 200) {
+            switch_screen_back();
+            last_backbuttonpresstime = millis();
+        }
+    }
+
+
+
+
+
+
+
+
     lv_timer_handler();
     delay(5);
 }

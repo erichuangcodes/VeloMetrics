@@ -45,6 +45,7 @@ void build_home_screen();
 void build_stats_screen();
 void build_map_screen();
 void switch_screen();
+void switch_screen_back();
 void add_screen_dots(lv_obj_t *screen, int active_index);
 void gps_to_pixel(float lat, float lon, int *px, int *py);
 void update_map();

@@ -69,8 +69,37 @@ Photos:
 ![alt text](image-3.png)
 **Total time spent: 2h**
 
-# August 6: Started making the CAD enclosure
+# August 6: Started making the CAD enclosure/brainstorming
+Began making the housing for all my parts. I was thinking that the gps module should be flush with the lcd screen, not under it, so it can have the most connection to the sky as I already was having problems with gps connectivity in this project before. 
+
+**Total time spent: 1.5h**
+
 
 # August 7: Made a few design aspect decisions 
 
-Sd card mechanisms, sliding shield to protect it when not in use, easy access and storage
+Sd card mechanisms, sliding shield to protect it when not in use, easy access and storage. I was planning to add a small 2mm thickness shield that you can slide into the top of the case so whenever you arent using the bike computer it will be protected from the environment. I was thinking about some sort of a SD card slot mechanism to lock the slider in place, but I realized that if I made the clearance decently tight the friction will solve that issue for me regardless.
+
+**Total time spent: 0.5h**
+
+# August 10: Troubleshooted UI not updating & Serial Monitor issues
+
+While I was working on the GPS and actually getting the gps to update the UI, I realized that there was a huge problem with the UI: It wasn't updating or anything, but the general UI still flashed. I added a screensaver to test if it was actually stuck or nothing was just updating. The former was true, and when the screensaver was supposed to circle around, it was just stuck. I realized that although the UI was rendering it probably stopped updating after like 2 frames. So I had to do a series of troubleshooting, where I tested the UI in various ways, and realized that the tick counter was the thing I had to initialize because in my platformio.ini I chose to ignore it. After I fixed that I also had to fix the serial monitor because all of my Serial.println was not rendering in the serial monitor. I realized this was because in my build flags I had directories to dfferent ports, and the serial monitor couldn't receive the information because of that. After I deleted those two directories the serial monitor was finally able to work reliably. 
+
+**Total time spent: 1.5h**
+
+# August 12: Improved CAD
+Refined the CAD. added a enclosement for the gps module at the top. added fillets and chamfers to the screw holes and the outside. added a cross and removed filament where the gps sits to make it receive signal better. I printed it out as a first prototype, and the clearances were pretty successful. The only issue is that the supports where the shield is supposed to be came out weird so I will have to address that in the future as I am reiterating. 
+
+**Total time spent: 1.5h**
+
+# August 14: Quick bug updates and intentional code data stops
+While testing the gps UI, I realized that I couldn't rely on my GPS the same way I could rely on a apple gps. Because apple gps systems are more advanced, they are able to display your location with minimal inaccuracies. My gps module was pretty accurate, but the only issue as that those small inaccuracies could build up and result in a inaccurate result. For example, I noticed that when there was a gust of wind, the gps would start producing results that were completly abnormal. Although I knew that the wind gusts wouldnt be a problem after the module was inside my enclosement, probably beacuse the gps was moving as it wasn't on a flat surface, I realized that this could be a significant issue if not fixed as both the distance and speed were changing. If the module added unnessecary distance while moving it could skew the final results of the full ride. I fixed that by adding code that treated values lower than a amuont I set it to be essentially nonexistent so those values wouldn't add up or show on the lcd. Additionally I wondered if the polling rate of the gps could be increased to give more accurate readings, and it did so I implemented that code. Then as I was testing my gps I realized that the gps kept showing F, and I wondered if that meant that something wasn't rendering. A quick google search let me to consider that platformio didn't create one of the build flags again so I searched up the solution to that and fixed the bug. 
+
+**Total time spent: 1h**
+
+# August 20: Added buttons to my project for switching screens back and forth
+Added buttons to the project, wired them up, and coded them. I had to add a extra function because the current switch screen function only had one purpose to keep swiping to the next and there was no back feature. Works great. 
+
+**Total time spent: 0.5h**
+
+# August 20: 

@@ -457,6 +457,23 @@ void switch_screen() {
     
 } 
 
+void switch_screen_back() {
+    if (current_screen == 0) {
+        lv_scr_load(map_screen);
+        current_screen = 2;
+    } else if (current_screen == 1) {
+        lv_scr_load(home_screen);
+        current_screen = 0;
+    } else if (current_screen == 2) {
+        lv_scr_load(stats_screen);
+        current_screen = 1;
+    }
+}
+
+
+
+
+
 void add_screen_dots(lv_obj_t *screen, int active_index) {
 
     lv_obj_t *dot1 = lv_obj_create(screen);
@@ -549,43 +566,49 @@ void update_ui() {
 
     //Speed
     if (speed_label != NULL) {
-    char speed_text[16];
+    char speed_text[8];
     lv_snprintf(speed_text, sizeof(speed_text), "%.1f", gps_speed_mph);
     lv_label_set_text(speed_label, speed_text);
 }
     // Distance
     if (distance_label != NULL) {
-    char distance_text[16];
+    char distance_text[8];
     lv_snprintf(distance_text, sizeof(distance_text), "%.1f mi", gps_distance_miles);
     lv_label_set_text(distance_label, distance_text);
 }
+    // Time
+    if (localtime_label != NULL) {
+        char time_str[8];
+        lv_snprintf(time_str, sizeof(time_str), "%02d:%02d", gps_local_hour, gps_local_minute);
+        lv_label_set_text(localtime_label, time_str);
+    }
     // Battery
     if (battery_label != NULL) {
-    char battery_text[16];
+    char battery_text[8];
     lv_snprintf(battery_text, sizeof(battery_text), "%d%%", fake_battery);
     lv_label_set_text(battery_label, battery_text);
 }
     // average speed
     if (avg_speed_label != NULL) {    
-    char avg_speed_text[16];
+    char avg_speed_text[8];
     lv_snprintf(avg_speed_text, sizeof(avg_speed_text), "%.1f", fake_avg_speed);
     lv_label_set_text(avg_speed_label, avg_speed_text);
     }
     // max speed
     if (max_speed_label != NULL) {
-    char max_speed_text[16];
+    char max_speed_text[8];
     lv_snprintf(max_speed_text, sizeof(max_speed_text), "%.1f", fake_max_speed);
     lv_label_set_text(max_speed_label, max_speed_text);
     }
     // calories text
     if (calories_label != NULL) {
-    char calories_text[16];
+    char calories_text[8];
     lv_snprintf(calories_text, sizeof(calories_text), "%d", fake_calories);
     lv_label_set_text(calories_label, calories_text);
     }
     //elevation text
     if (elevation_label_stats != NULL) {
-    char elevation_text[16];
+    char elevation_text[8];
     lv_snprintf(elevation_text, sizeof(elevation_text), "%d", fake_elevation);
     lv_label_set_text(elevation_label_stats, elevation_text);
     }

@@ -20,5 +20,7 @@ extern float gps_distance_miles;
 extern float gps_lat;
 extern float gps_lon;
 extern bool gps_valid;
+extern int gps_local_hour;
+extern int gps_local_minute;
 
 #endif
