@@ -11,11 +11,19 @@ HardwareSerial gpsSerial(1);
 // Current values
 float gps_speed_mph = 0.0f;
 float gps_distance_miles = 0.0f;
+float gps_max_speed_mph = 0.0f;
+float gps_avg_speed_mph = 0.0f;
 float gps_lat = 0.0f;
 float gps_lon = 0.0f;
 bool gps_valid = false;
 int gps_local_hour = 0;
 int gps_local_minute = 0;
+
+
+//Session tracking
+uint32_t session_start_time = 0;
+bool session_active = false;
+uint32_t session_elapsed_ms = 0;
 
 // Tracks previous position for distance calculation
 static float prev_lat = 0.0f;
@@ -34,6 +42,17 @@ void gps_init() {
     };
     gpsSerial.write(setRate5Hz, sizeof(setRate5Hz));
 }
+
+void gps_start_session() {
+    session_start_time = millis();
+    session_active = true;
+}
+
+void gps_stop_session() {
+    session_active = false; 
+}
+
+
 
 #define GPS_SPEED_DEADBAND_MPH 1.0f //Makes anything below 1mph not really moving
 #define GPS_DISTANCE_DEADBAND_METERS 1.5f // makes anything below 1.5 meteres not actually moving
@@ -72,6 +91,25 @@ void gps_update() {
         gps_lat = current_lat;
         gps_lon = current_lon;
     }
+
+
+    //gps max speed update
+    if (gps_speed_mph > gps_max_speed_mph) {
+        gps_max_speed_mph = gps_speed_mph;
+    }
+
+
+    //avg speed
+    if (session_active) {
+        session_elapsed_ms = millis() - session_start_time;
+        float elapsed_hours = session_elapsed_ms / 3600000.0f; // convert ms to hours
+
+        if (elapsed_hours > 0) {
+            gps_avg_speed_mph = gps_distance_miles / elapsed_hours;
+        }
+    }
+
+
 
 
     //Time function for local time

@@ -102,4 +102,6 @@ Added buttons to the project, wired them up, and coded them. I had to add a extr
 
 **Total time spent: 0.5h**
 
-# August 20: 
+# August 21: started wiring up the other stats: max speed and avg speed 
+
+**Total time spent: 2h**

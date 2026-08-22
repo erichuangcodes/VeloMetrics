@@ -15,6 +15,7 @@ lv_obj_t *home_screen = NULL;
 lv_obj_t *stats_screen = NULL;
 lv_obj_t *map_screen = NULL;
 lv_obj_t *settings_screen = NULL;
+lv_obj_t *sessions_screen = NULL;
 lv_obj_t *header_container = NULL;
 
 // Dynamic Labels - Home Screen 
@@ -35,18 +36,28 @@ lv_obj_t *bluetooth_label = NULL;
 lv_obj_t *temp_label = NULL;
 lv_obj_t *localtime_label = NULL;
 
+//session screen objects
+lv_obj_t *session_status = NULL;
+
 static lv_obj_t *home_dot;
 static lv_obj_t *stats_dot;
 static lv_obj_t *settings_dot;
+static lv_obj_t *sessions_dot;
+
+
+
 lv_obj_t *screensaver = NULL;
+
+
+
 
 // Testing / Mock Data Values
 int fake_battery = 68;
-int fake_temp = 35;
-float fake_avg_speed = 14.2f;
-float fake_max_speed = 22.8f;
 int fake_elevation = 320;
 int fake_calories = 187;
+
+
+
 
 
 //GPS
@@ -105,16 +116,10 @@ void create_global_header() {
     //Header Labels
 
     localtime_label = lv_label_create(header_container);
-    lv_label_set_text(localtime_label, "12:34");
+    lv_label_set_text(localtime_label, "00:00");
     lv_obj_set_style_text_font(localtime_label, &Exo_18_Regular, 0);
     lv_obj_set_style_text_color(localtime_label, lv_color_black(), 0);
     lv_obj_align(localtime_label, LV_ALIGN_TOP_LEFT, 10, 8);
-
-    temp_label = lv_label_create(header_container);
-    lv_label_set_text(temp_label, "35 C");
-    lv_obj_set_style_text_font(temp_label, &Exo_18_Regular, 0);
-    lv_obj_set_style_text_color(temp_label, lv_color_black(), 0);
-    lv_obj_align(temp_label, LV_ALIGN_TOP_MID, 0, 8);
 
     battery_label = lv_label_create(header_container);
     lv_label_set_text(battery_label, "68%");
@@ -269,7 +274,7 @@ void build_stats_screen() {
     lv_obj_set_pos(avg_label, 8, 82);
 
     avg_speed_label = lv_label_create(stats_screen);
-    lv_label_set_text(avg_speed_label, "13.6");
+    lv_label_set_text(avg_speed_label, "---");
     lv_obj_set_style_text_font(avg_speed_label, &Orbitron_48_Regular, 0);
     lv_obj_set_style_text_color(avg_speed_label, lv_color_black(), 0);
     lv_obj_set_pos(avg_speed_label, 60, 48);
@@ -281,7 +286,7 @@ void build_stats_screen() {
     lv_obj_set_pos(max_label, 8, 159);
 
     max_speed_label = lv_label_create(stats_screen);
-    lv_label_set_text(max_speed_label, "26.6");
+    lv_label_set_text(max_speed_label, "0.0");
     lv_obj_set_style_text_font(max_speed_label, &Orbitron_48_Regular, 0);
     lv_obj_set_style_text_color(max_speed_label, lv_color_black(), 0);
     lv_obj_set_pos(max_speed_label, 60, 118);
@@ -538,9 +543,36 @@ void update_ui() {
         lv_label_set_text(time_label, time_text);
     }
 
+    if (!session_active) {
+        lv_label_set_text(time_label, "---");
+        lv_label_set_text(avg_speed_label, "---");
+        lv_label_set_text(distance_label, "---");
+    } else {
+        lv_label_set_text(session_status, "Session Active");
+
+        uint32_t total_seconds = session_elapsed_ms / 1000;
+        uint32_t hours = total_seconds / 3600;
+        uint32_t minutes = (total_seconds % 3600) / 60;
+        uint32_t seconds = total_seconds % 60;
+        //Session time elapsed
+        char time_str[16];
+        lv_snprintf(time_str, sizeof(time_str), "%02u:%02u:%02u", hours, minutes, seconds);
+        lv_label_set_text(time_label, time_str);
+
+        // Session average speed
+        char avg_speed_str[16];
+        lv_snprintf(avg_speed_str, sizeof(avg_speed_str), "%.1f mi/h", gps_avg_speed_mph);
+        lv_label_set_text(avg_speed_label, avg_speed_str);
+
+        //Session distance
+        char distance_str[16];
+        lv_snprintf(distance_str, sizeof(distance_str), "%.1f mi", gps_distance_miles);
+        lv_label_set_text(distance_label, distance_str);
+    }
+
+
     if (!gps_valid) {
         lv_label_set_text(speed_label, "---");
-        lv_label_set_text(distance_label, "No GPS");
         return;
     }
 
@@ -564,51 +596,46 @@ void update_ui() {
         update_map();
     }
 
-    //Speed
+    // General Speed
     if (speed_label != NULL) {
-    char speed_text[8];
+    char speed_text[16];
     lv_snprintf(speed_text, sizeof(speed_text), "%.1f", gps_speed_mph);
     lv_label_set_text(speed_label, speed_text);
 }
-    // Distance
+    // Session Distance
     if (distance_label != NULL) {
-    char distance_text[8];
+    char distance_text[16];
     lv_snprintf(distance_text, sizeof(distance_text), "%.1f mi", gps_distance_miles);
     lv_label_set_text(distance_label, distance_text);
 }
-    // Time
+    // Local Time
     if (localtime_label != NULL) {
-        char time_str[8];
+        char time_str[16];
         lv_snprintf(time_str, sizeof(time_str), "%02d:%02d", gps_local_hour, gps_local_minute);
         lv_label_set_text(localtime_label, time_str);
     }
     // Battery
     if (battery_label != NULL) {
-    char battery_text[8];
+    char battery_text[16];
     lv_snprintf(battery_text, sizeof(battery_text), "%d%%", fake_battery);
     lv_label_set_text(battery_label, battery_text);
 }
-    // average speed
-    if (avg_speed_label != NULL) {    
-    char avg_speed_text[8];
-    lv_snprintf(avg_speed_text, sizeof(avg_speed_text), "%.1f", fake_avg_speed);
-    lv_label_set_text(avg_speed_label, avg_speed_text);
-    }
+
     // max speed
     if (max_speed_label != NULL) {
-    char max_speed_text[8];
-    lv_snprintf(max_speed_text, sizeof(max_speed_text), "%.1f", fake_max_speed);
+    char max_speed_text[16];
+    lv_snprintf(max_speed_text, sizeof(max_speed_text), "%.1f", gps_max_speed_mph);
     lv_label_set_text(max_speed_label, max_speed_text);
     }
     // calories text
     if (calories_label != NULL) {
-    char calories_text[8];
+    char calories_text[16];
     lv_snprintf(calories_text, sizeof(calories_text), "%d", fake_calories);
     lv_label_set_text(calories_label, calories_text);
     }
     //elevation text
     if (elevation_label_stats != NULL) {
-    char elevation_text[8];
+    char elevation_text[16];
     lv_snprintf(elevation_text, sizeof(elevation_text), "%d", fake_elevation);
     lv_label_set_text(elevation_label_stats, elevation_text);
     }

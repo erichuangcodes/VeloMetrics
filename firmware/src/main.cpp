@@ -9,6 +9,7 @@
 
 #define frontbutton 4
 #define backbutton 5
+#define startsessionbutton 6
 
 
 // Create the TFT display driver
@@ -68,6 +69,7 @@ void setup() {
 
     pinMode(frontbutton, INPUT_PULLUP);
     pinMode(backbutton, INPUT_PULLUP);
+    pinMode(startsessionbutton, INPUT_PULLUP);
 }
 
 void loop() {
@@ -114,8 +116,21 @@ void loop() {
         }
     }
 
+    static bool last_startsessionbutton_state = HIGH;
+    static uint32_t last_startsessionbuttonpress_time = 0;
+    bool current_startsessionbutton_state = digitalRead(startsessionbutton);
+    if (current_startsessionbutton_state == LOW && last_startsessionbutton_state == HIGH) {
+        if (millis()- last_startsessionbuttonpress_time > 200) {
+            if (!session_active) {
+                gps_start_session();
+            } else {
+                gps_stop_session();
+            }
+            last_startsessionbuttonpress_time = millis();
+                }
 
-
+            }
+    last_startsessionbutton_state = current_startsessionbutton_state;
 
 
 
@@ -123,4 +138,10 @@ void loop() {
 
     lv_timer_handler();
     delay(5);
-}
+        }
+
+
+
+
+
+    

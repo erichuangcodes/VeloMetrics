@@ -24,7 +24,6 @@ extern lv_obj_t *elevation_label_stats;
 
 extern lv_obj_t *battery_label;
 extern lv_obj_t *bluetooth_label;
-extern lv_obj_t *temp_label;
 extern lv_obj_t *localtime_label;
 
 extern lv_obj_t *position_dot;
