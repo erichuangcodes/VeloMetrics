@@ -528,32 +528,28 @@ void update_ui() {
         }
     }
 
-    // TEMP TEST — fake incrementing time, confirms labels update even without GPS.
-    // Also placed before the gps_valid check so it keeps climbing regardless of fix status.
-    if (time_label != NULL) {
-        static uint32_t fake_seconds = 0;
-        fake_seconds++;
-
-        uint32_t hours = fake_seconds / 3600;
-        uint32_t minutes = (fake_seconds % 3600) / 60;
-        uint32_t seconds = fake_seconds % 60;
-
-        char time_text[16];
-        lv_snprintf(time_text, sizeof(time_text), "%02u:%02u:%02u", hours, minutes, seconds);
-        lv_label_set_text(time_label, time_text);
+    //500ms update interval
+    static uint32_t last_label_update = 0;
+    uint32_t label_now = lv_tick_get();
+    if (label_now - last_label_update < 500) {
+        return;
     }
+    last_label_update = label_now;
 
     if (!session_active) {
         lv_label_set_text(time_label, "---");
         lv_label_set_text(avg_speed_label, "---");
         lv_label_set_text(distance_label, "---");
     } else {
-        lv_label_set_text(session_status, "Session Active");
+        if (session_status != NULL) {
+            lv_label_set_text(session_status, "Session Active");
+        }
 
         uint32_t total_seconds = session_elapsed_ms / 1000;
         uint32_t hours = total_seconds / 3600;
         uint32_t minutes = (total_seconds % 3600) / 60;
         uint32_t seconds = total_seconds % 60;
+
         //Session time elapsed
         char time_str[16];
         lv_snprintf(time_str, sizeof(time_str), "%02u:%02u:%02u", hours, minutes, seconds);
@@ -561,12 +557,12 @@ void update_ui() {
 
         // Session average speed
         char avg_speed_str[16];
-        lv_snprintf(avg_speed_str, sizeof(avg_speed_str), "%.1f mi/h", gps_avg_speed_mph);
+        lv_snprintf(avg_speed_str, sizeof(avg_speed_str), "%.1f", gps_avg_speed_mph);
         lv_label_set_text(avg_speed_label, avg_speed_str);
 
         //Session distance
         char distance_str[16];
-        lv_snprintf(distance_str, sizeof(distance_str), "%.1f mi", gps_distance_miles);
+        lv_snprintf(distance_str, sizeof(distance_str), "%.1f mi", session_distance);
         lv_label_set_text(distance_label, distance_str);
     }
 
@@ -575,13 +571,6 @@ void update_ui() {
         lv_label_set_text(speed_label, "---");
         return;
     }
-
-    static uint32_t last_label_update = 0;
-    uint32_t label_now = lv_tick_get();
-    if (label_now - last_label_update < 500) {
-        return;
-    }
-    last_label_update = label_now;
     
     // Feed GPS coordinates to map trail ]
     static uint32_t last_point_time = 0;
@@ -601,25 +590,7 @@ void update_ui() {
     char speed_text[16];
     lv_snprintf(speed_text, sizeof(speed_text), "%.1f", gps_speed_mph);
     lv_label_set_text(speed_label, speed_text);
-}
-    // Session Distance
-    if (distance_label != NULL) {
-    char distance_text[16];
-    lv_snprintf(distance_text, sizeof(distance_text), "%.1f mi", gps_distance_miles);
-    lv_label_set_text(distance_label, distance_text);
-}
-    // Local Time
-    if (localtime_label != NULL) {
-        char time_str[16];
-        lv_snprintf(time_str, sizeof(time_str), "%02d:%02d", gps_local_hour, gps_local_minute);
-        lv_label_set_text(localtime_label, time_str);
     }
-    // Battery
-    if (battery_label != NULL) {
-    char battery_text[16];
-    lv_snprintf(battery_text, sizeof(battery_text), "%d%%", fake_battery);
-    lv_label_set_text(battery_label, battery_text);
-}
 
     // max speed
     if (max_speed_label != NULL) {
@@ -627,6 +598,27 @@ void update_ui() {
     lv_snprintf(max_speed_text, sizeof(max_speed_text), "%.1f", gps_max_speed_mph);
     lv_label_set_text(max_speed_label, max_speed_text);
     }
+
+    // Distance
+    if (!session_active && distance_label != NULL) {
+    char distance_text[16];
+    lv_snprintf(distance_text, sizeof(distance_text), "%.1f mi", gps_distance_miles);
+    lv_label_set_text(distance_label, distance_text);
+    }
+    // Local Time
+    if (localtime_label != NULL) {
+        char time_str[16];
+        lv_snprintf(time_str, sizeof(time_str), "%02d:%02d", gps_local_hour, gps_local_minute);
+        lv_label_set_text(localtime_label, time_str);
+    }
+
+    // Battery
+    if (battery_label != NULL) {
+    char battery_text[16];
+    lv_snprintf(battery_text, sizeof(battery_text), "%d%%", fake_battery);
+    lv_label_set_text(battery_label, battery_text);
+    }
+
     // calories text
     if (calories_label != NULL) {
     char calories_text[16];

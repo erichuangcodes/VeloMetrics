@@ -104,6 +104,7 @@ void loop() {
             last_frontbuttonpress_time = millis();
         }
     }
+    last_frontbutton_state = current_frontbutton_state;
 
     static bool last_backbutton_state = HIGH;
     static uint32_t last_backbuttonpresstime = 0;
@@ -115,6 +116,7 @@ void loop() {
             last_backbuttonpresstime = millis();
         }
     }
+    last_backbutton_state = current_backbutton_state;
 
     static bool last_startsessionbutton_state = HIGH;
     static uint32_t last_startsessionbuttonpress_time = 0;

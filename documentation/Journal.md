@@ -103,5 +103,7 @@ Added buttons to the project, wired them up, and coded them. I had to add a extr
 **Total time spent: 0.5h**
 
 # August 21: started wiring up the other stats: max speed and avg speed 
-
+Wrote the code for calculating the max speed and average speed today. However, I realized that the average speed could only be calculated if you actually start a session like strava, in which it calculates the average speed using the session distance / the session time. I had to create new functions based off that and it took some troubleshooting to get all the new features down. I also wired a new button to my project which would start a session. Will add a start session screen and end result screen after im done with the other stats (calories and elevation). I also did localtime calculations where I take my gps data, compare it to the UTC, create a offset, and calculate my local hour based off that. 
 **Total time spent: 2h**
+
+# August 22: 

@@ -17,6 +17,8 @@ void gps_update();
 // Current GPS values (updated every loop)
 extern float gps_speed_mph;
 extern float gps_distance_miles;
+extern float session_start_distance_miles = 0.0f;
+extern float session_distance;
 extern float gps_max_speed_mph;
 extern float gps_avg_speed_mph;
 extern float gps_lat;

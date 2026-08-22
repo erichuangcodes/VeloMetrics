@@ -11,6 +11,8 @@ HardwareSerial gpsSerial(1);
 // Current values
 float gps_speed_mph = 0.0f;
 float gps_distance_miles = 0.0f;
+float session_start_distance_miles = 0.0f;
+float session_distance = 0.0f; 
 float gps_max_speed_mph = 0.0f;
 float gps_avg_speed_mph = 0.0f;
 float gps_lat = 0.0f;
@@ -45,11 +47,14 @@ void gps_init() {
 
 void gps_start_session() {
     session_start_time = millis();
+    session_start_distance_miles = gps_distance_miles;
     session_active = true;
 }
 
 void gps_stop_session() {
     session_active = false; 
+    session_distance = 0.0f;
+    gps_avg_speed_mph = 0.0f;
 }
 
 
@@ -103,9 +108,9 @@ void gps_update() {
     if (session_active) {
         session_elapsed_ms = millis() - session_start_time;
         float elapsed_hours = session_elapsed_ms / 3600000.0f; // convert ms to hours
-
+        float session_distance = gps_distance_miles - session_start_distance_miles;
         if (elapsed_hours > 0) {
-            gps_avg_speed_mph = gps_distance_miles / elapsed_hours;
+            gps_avg_speed_mph = session_distance / elapsed_hours;
         }
     }
 
@@ -117,7 +122,7 @@ void gps_update() {
         float lon_value = gps_lon/15.0f;
         int offset = (int)round(lon_value);
         int raw_hour = gps.time.hour();
-        gps_local_hour = (raw_hour + 24) % 24;
+        gps_local_hour = (raw_hour + offset + 24) % 24;
         gps_local_minute = gps.time.minute();
     }
 
